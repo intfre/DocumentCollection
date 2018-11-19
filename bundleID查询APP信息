@@ -1,0 +1,61 @@
+(1 ) 这是很重要的：
+
+(千万要注意：下面的bundleId必须写成bundleId,不能写成 bundleid或者bundleID)
+
+https://itunes.apple.com/lookup?bundleId=你APP的Bundle ID
+
+（你也可以用http，不用https, 但是貌似最近http经常获取不到)
+
+
+
+
+
+(2) 如果找到了，返回json格式的数据：
+
+比如：
+
+{
+ "resultCount":1,
+ "results": [
+{"kind":"software", "features":[], 
+"supportedDevices":["iPhone5s", "iPhone4", "iPadFourthGen", "iPadWifi", "iPadFourthGen4G", "iPodTouchourthGen", "iPad2Wifi", "iPhone4S", "iPadMini4G", "iPhone-3GS", "iPhone5", "iPodTouchFifthGen", "iPhone5c", "iPad3G", "iPadThirdGen4G", "iPadMini", "iPodTouchThirdGen", "iPadThirdGen", "iPad23G"], "isGameCenterEnabled":false, "screenshotUrls":["http://a2.mzstatic.com/us/r30/Purple6/v4/65/d9/f4/65d9f4c8-83aa-aedc-7d33-17bfcd95f329/screen1136x1136.jpeg"], "ipadScreenshotUrls":[], "artworkUrl60":"http://a637.phobos.apple.com/us/r30/Purple/v4/f9/c6/d2/f9c6d227-bab9-3008-88b6-ea74e48510a7/57.png", "artworkUrl512":"http://a157.phobos.apple.com/us/r30/Purple4/v4/c7/77/dd/c777dd5f-a1c2-e0fa-6a6f-1c4e3db98c12/mzl.tqbteywq.png", "artistViewUrl":"https://itunes.apple.com/us/artist/shenzhen-reecam-tech.-ltd./id479468962?uo=4", "artistId":479468962, "artistName":"Shenzhen Reecam Tech. Ltd.", "price":0.00, "version":"1.1.9", 
+"description":"1, play video and audio via IP Camera \n2, it can directly access camera in LAN or internet \n3, get a snapshot from video and save it into the album \n4, search cameras in LAN \n5, it can control a camera via WIFI \n6, play video in full-screen \n7, reconnect to camera automaticly \n8, smart connection", "currency":"USD", "genres":["Business", "Photo & Video"], "genreIds":["6000", "6008"], "releaseDate":"2014-01-28T19:57:38Z", "sellerName":"Shen Zhen Rui Cai TECH.LTD", "bundleId":"net.reecam.uccamPush", "trackId":805363884, "trackName":"UCCAM.", "primaryGenreName":"Business", "primaryGenreId":6000, "releaseNotes":"(1) new notice interface\n(2) get alarm pictures when click  the \"OK\" button on notice interface", "formattedPrice":"Free", "wrapperType":"software", "trackCensoredName":"UCCAM.", "languageCodesISO2A":["EN", "ZH"], "fileSizeBytes":"16497902", "sellerUrl":"http://www.reecam.net", "contentAdvisoryRating":"4+", "artworkUrl100":"http://a157.phobos.apple.com/us/r30/Purple4/v4/c7/77/dd/c777dd5f-a1c2-e0fa-6a6f-1c4e3db98c12/mzl.tqbteywq.png", "trackViewUrl":"https://itunes.apple.com/us/app/uccam./id805363884?mt=8&uo=4", "trackContentRating":"4+"}]
+}
+
+版本号：找到那个"version"，它的值就是版本号
+
+URL：找到那个“trackViewUrl", 它的值就是介绍这个APP的链接网址
+
+你可以对比本地APP的版本号和APP Store上发布的版本号，如果有新版本，可以提示用户要更新...
+
+
+
+(3)如果没找到:
+
+{
+ "resultCount":0,
+ "results": []
+}
+
+
+（4）这里顺便告诉大家用 JSONKit 取出版本号，
+
+//注意：这里是示例，用阻塞操作，不考虑异常情况
+
+//下面读取的是本地APP的Bundle ID：
+
+NSString* bundleID = [[NSBundle mainBundle] objectForInfoDictionaryKey: (NSString*) kCFBundleIdentifierKey];
+
+NSString* strURL = [ NSString stringWithFormat:@"https://itunes.apple.com/lookup?bundleId=%@",bundleID ];
+
+NSData* data = [ NSData dataWithContentsOfURL:[ NSURL URLWithString: strURL ]];
+
+NSDictionary* dic = [data objectFromJSONData ];
+
+NSArray* resultArray = [ dic objectForKey:@"results"];
+
+NSDictionary* subDict = [resultArray objectAtIndex: 0 ];
+NSString* strVersion = [subDict objectForKey: @"version"];
+
+这个strVersion就是版本号啦
+
